@@ -3,8 +3,6 @@ import sys
 import signal
 import threading
 from time import sleep
-import asyncio
-# from websockets import serve
 import socketserver
 from http_server import MyHttpRequestHandler
 from simple_websocket_server import WebSocketServer, WebSocket
@@ -35,7 +33,6 @@ mqtt = None
 
 client_handler = ClientEvents(mqtt)
 
-import json
 
 class WebsocketHandler(WebSocket):
     def handle(self):
@@ -92,6 +89,7 @@ def start_heartbeat():
     while True:
         sleep(1)
         mqtt.publish_register()
+
 
 def shutdown_services():
     mqtt_client_run = False
