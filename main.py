@@ -33,6 +33,7 @@ mqtt = None
 
 client_handler = ClientEvents(mqtt)
 
+http_server = None
 
 class WebsocketHandler(WebSocket):
     def handle(self):
@@ -79,10 +80,11 @@ def start_ws_server():
 
 
 def start_http_server():
+    global http_server
     handler_object = MyHttpRequestHandler
     PORT = 80
-    my_server = socketserver.TCPServer(("", PORT), handler_object)
-    my_server.serve_forever()
+    http_server = socketserver.TCPServer(("", PORT), handler_object)
+    http_server.serve_forever()
 
 
 def start_heartbeat():
@@ -99,6 +101,8 @@ def shutdown_services():
     ws_server_thread.join(1)
 
     http_server_run = False
+    http_server.shutdown()
+    http_server.server_close()
     http_server_thread.join(1)
 
     heartbeat_run = False
