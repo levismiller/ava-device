@@ -65,7 +65,7 @@ def start_mqtt_client():
 
     mqtt_user = "n3xus"
     mqtt_pwd = "n3xus"
-    mqtt_host = "137.184.118.182"
+    mqtt_host = "146.190.1.236"
     mqtt_port = 1883
 
     mqtt = MQTTClient(mqtt_user, mqtt_pwd, mqtt_host, client_id, update_ws_clients, mqtt_port)
@@ -80,7 +80,7 @@ def start_ws_server():
 
 def start_http_server():
     handler_object = MyHttpRequestHandler
-    PORT = 8000
+    PORT = 80
     my_server = socketserver.TCPServer(("", PORT), handler_object)
     my_server.serve_forever()
 
