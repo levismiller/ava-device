@@ -1,39 +1,34 @@
-from mqtt_client import MQTTClient
-import sys
+import os
 import signal
+import socket
+import sys
 import threading
 from time import sleep
-import socketserver
-from http_server import MyHttpRequestHandler
-from simple_websocket_server import WebSocketServer, WebSocket
-from client_events import ClientEvents
-import socket
-import os
+
 from dotenv import load_dotenv
+from flask import Flask
+from simple_websocket_server import WebSocketServer, WebSocket
+
+from client_events import ClientEvents
+from mqtt_client import MQTTClient
 
 load_dotenv()
 
 hardware = os.getenv('HARDWARE')
 client_id = f"{hardware}-{socket.gethostname()}"
 
-mqtt_client_run = True
+app = Flask(__name__,
+            static_url_path='',
+            static_folder='static',
+            template_folder='templates')
+
 mqtt_client_thread = None
-
-ws_server_run = True
 ws_server_thread = None
-
-http_server_run = True
-http_server_thread = None
-
-heartbeat_run = True
 heartbeat_thread = None
-
 ws_clients = []
 mqtt = None
-
 client_handler = ClientEvents(mqtt)
 
-http_server = None
 
 class WebsocketHandler(WebSocket):
     def handle(self):
@@ -79,33 +74,16 @@ def start_ws_server():
     server.serve_forever()
 
 
-def start_http_server():
-    global http_server
-    handler_object = MyHttpRequestHandler
-    PORT = 80
-    http_server = socketserver.TCPServer(("", PORT), handler_object)
-    http_server.serve_forever()
-
-
 def start_heartbeat():
+    global mqtt
     while True:
         sleep(1)
         mqtt.publish_register()
 
 
 def shutdown_services():
-    mqtt_client_run = False
     mqtt_client_thread.join(1)
-
-    ws_server_run = False
     ws_server_thread.join(1)
-
-    http_server_run = False
-    http_server.shutdown()
-    http_server.server_close()
-    http_server_thread.join(1)
-
-    heartbeat_run = False
     heartbeat_thread.join(1)
 
     sys.exit(0)
@@ -124,12 +102,9 @@ if __name__ == "__main__":
     ws_server_thread.daemon = False
     ws_server_thread.start()
 
-    http_server_thread = threading.Thread(target=start_http_server)
-    http_server_thread.setName('http_server')
-    http_server_thread.daemon = False
-    http_server_thread.start()
-
     heartbeat_thread = threading.Thread(target=start_heartbeat)
     heartbeat_thread.setName('heartbeat')
     heartbeat_thread.daemon = False
     heartbeat_thread.start()
+
+    app.run(port=8000)

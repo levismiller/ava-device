@@ -1,4 +1,13 @@
+click==8.1.2
+Flask==2.1.1
+importlib-metadata==4.11.3
+itsdangerous==2.1.2
+Jinja2==3.1.1
+MarkupSafe==2.1.1
 paho-mqtt==1.6.1
 python-dotenv==0.20.0
 simple-websocket-server==0.4.1
+typing_extensions==4.2.0
 websockets==10.3
+Werkzeug==2.1.1
+zipp==3.8.0
